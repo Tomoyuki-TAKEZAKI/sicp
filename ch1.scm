@@ -61,6 +61,27 @@
 ;;; インタプリタは (p) の評価を行うが、(p) が再帰的に評価され無限ループに陥る。
 ;;; test 式の述語式の評価に到達せず、インタプリタは値を返すことができない。
 
+
+;;; EXERCISE 1.8
+
+(define (cube-root x)
+
+  (define (cube-root-iter guess)
+    (if (good-enough? guess)
+        guess
+        (cube-root-iter (improve guess))))
+
+  (define (improve guess)
+    (/ (+ (/ x (square guess)) (* 2 guess)) 3))
+
+  (define (good-enough? guess)
+    (< (abs (- (cube guess) x)) 0.001))
+
+  (define (cube x) (* x x x))
+
+  (cube-root-iter 1.0))
+
+
 ;;; EXERCISE 1.9
 
 
