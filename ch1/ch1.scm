@@ -1,3 +1,59 @@
+;;; EXERCISE 1.1
+
+10
+
+;; 10
+
+(+ 5 3 4)
+
+;; 12
+
+(- 9 1)
+
+;; 8
+
+(/ 6 2)
+
+;; 3
+
+(+ (* 2 4) (- 4 6))
+
+;; 6
+
+(define a 3)
+(define b (+ a 1))
+(+ a b (* a b))
+
+;; 19
+
+(= a b)
+
+;; #f
+
+(if (and (> b a) (< b (* a b)))
+    b
+    a)
+
+;; 4
+
+(cond ((= a 4) 6)
+      ((= b 4) (+ 6 7 a))
+      (else 25))
+
+;; 16
+
+(+ 2 (if (> b a) b a))
+
+;; 6
+
+(* (cond((> a b) a)
+        ((< a b) b)
+        (else -1))
+   (+ a 1))
+
+;; 16
+
+
 ;;; EXERCISE 1.2
 
 (/ (+ 5 4
@@ -339,4 +395,106 @@
 ;; したがって、手続き (sine a) によって生成されるプロセスが使用する
 ;; 空間とステップ数の増加オーダーは $ \Theta( \log a ) $ 。
 ;; 対数の底の変換は項に定数倍の影響しか与えないため省略した。
+
+
+;;; EXERCISE 1.16
+
+;; 基数 b, 指数 n に対して、状態 (b, n, a) を定義する
+;; そして、ab^n が不変量となるような状態変換を次の通り与える
+
+;; n > 0 かつ n が偶数のとき
+;; (b, n, a) -> (b^2, n/2, a)
+
+;; n > 0 かつ n が奇数のとき
+;; (b, n, a) -> (b, n-1, ab)
+
+;; 指数計算を対数的ステップ数で実行する反復的プロセスを生成する手続きを
+;; 次の通り与えることができる
+
+(define (fast-expt b n)
+  (fast-expt-iter b n 1))
+
+(define (fast-expt-iter b counter product)
+  (cond ((= counter 0) product)
+        ((even? counter) (fast-expt-iter (square b) (/ counter 2) product))
+        (else (fast-expt-iter b (- counter 1) (* b product)))))
+  
+(define (even? n)
+  (= (remainder n 2) 0))
+
+
+;;; EXERCISE 1.17
+
+;; 掛け算を double, halve, 足し算の対数的ステップ数で実行する線形再帰プロセスを生成する手続きを
+;; 次の通り与えることができる
+
+(define (times a b)
+  (cond ((= b 0) 0)
+        ((= b 1) a)
+        ((even? b) (times (double a) (halve b)))
+        (else (+ a (times a (- b 1))))))
+
+(define (double n)
+  (* n 2))
+
+(define (halve n)
+  (/ n 2))
+
+
+;;; EXERCISE 1.18
+
+;; a, b に対して、状態 (a, b, c) を定義する
+;; そして、 ab + c が不変量となるような状態変換を次の通り与える
+
+;; b > 1 かつ b が偶数のとき
+;; (a, b, c) -> ((double a), (halve b), c)
+
+;; b > 1 かつ b が奇数のとき
+;; (a, b, c) -> (a, b-1, c + a)
+
+;; 掛け算を double, halve, 足し算の対数的ステップ数で実行する反復プロセスを生成する手続きを
+;; 次の通り与えることができる
+
+(define (times a b)
+  (times-iter a b 0))
+
+(define (times-iter a b c)
+  (cond ((= b 0) 0)
+        ((= b 1) (+ a c))
+        ((even? b) (times-iter (double a) (halve b) c))
+        (else (times-iter a (- b 1) (+ a c) ))))
+
+
+;;; EXERCISE 1.19
+
+;; ペア (a,b) に対し、変換族 $ T_{pq} $ を次の通り定義する
+
+;; a <- bq + aq + ap
+;; b <- bp + aq
+
+;; $ T_{pq} $ を二回適用した変換もまた同じ形式を $ T_{p'q'} $ 一回適用するのと同じことであり、
+;; 愚直な計算から p', q' は次の通り与えられる 
+
+;; p' = p^2 + q^2
+;; q' = 2pq + q^2
+
+;; この事実を利用して、フィボナッチ数を対数的ステップ数で実行する反復プロセスを生成する手続きを
+;; 次の通り与えることができる
+
+(define (fib n)
+  (fib-iter 1 0 0 1 n))
+
+(define (fib-iter a b p q count)
+  (cond ((= count 0) b)
+        ((even? count)
+         (fib-iter a
+                   b
+                   (+ (* p p) (* q q))
+                   (+ (* 2 p q) (* q q))
+                   (/ count 2)))
+        (else (fib-iter (+ (* b q) (* a q) (* a p))
+                        (+ (* b p) (* a q))
+                        p
+                        q
+                        (- count 1)))))
 
