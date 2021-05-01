@@ -498,3 +498,42 @@
                         q
                         (- count 1)))))
 
+
+;;; EXERCISE 1.21
+
+(smallest-divisor 199)
+;; 199
+
+(smallest-divisor 1999)
+;; 1999
+
+(smallest-divisor 19999)
+;; 7
+
+
+;;; EXERCISE 1.26
+
+
+;; Louis による expmod 手続きは次の通り
+
+(define (expmod base exp m)
+  (cond ((= exp 0) 1)
+        ((even? exp)
+         (remainder (* (expmod base (/ exp 2) m)
+                       (expmod base (/ exp 2) m))
+                    m))
+        (else
+          (remainder (* base
+                        (expmod base (- exp 1) m)) 
+                     m))))
+
+;; この実装では、expmod 手続きの中で expmod 手続きが二回使われている。
+;; expmod の呼び出しが k 重でネストしているとき、その合計呼び出し回数は最大で
+
+;; 2^0 + 2^1 + ... + 2^(k-1) = 2^k
+
+;; となる。一方、 square を使う場合は呼び出し回数が最大で k 回である。
+;; 入力を n とすると k はおよそ $ \log (n) $ に等しい。
+;; したがって、元の square を使う手続きが $ \Theta ( \log n ) $ であるのに対して、
+;; Louis の手続きは $ \Theta (n) $ である。
+
