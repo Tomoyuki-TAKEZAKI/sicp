@@ -697,3 +697,46 @@
 ;; 10 ステップを要した
 
 
+;;; EXERCISE 1.40
+
+(define (cubic a b c)
+    (lambda (x) (+ (cube x) (* a (square x)) (* b x) c)))
+
+
+;;; EXERCISE 1.41
+
+(define (double f) 
+  (lambda (x) (f (f x))))
+
+
+;;; EXERCISE 1.42
+
+(define (compose f g)
+  (lambda (x) (f (g x))))
+
+
+;;; EXERCISE 1.43
+
+(define (repeated f n)
+  (if (= n 1)
+      f
+      (compose f (repeated f (- n 1)))))
+
+
+;;; EXERCISE 1.44
+
+(define (smooth f)
+  (lambda (x) (+ (f (- x dx))
+                 (f x)
+                 (f (+ x dx)))))
+
+(define (n-fold-smooth f n)
+  (repeated (smooth f) n))
+
+
+;;; EXERCISE 1.45
+
+(define (n-th-root x n)
+  (fixed-point (repeated (average-damp (lambda (y) (/ x (expt y (- n 1))))) n)
+               1.0))
+
