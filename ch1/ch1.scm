@@ -622,7 +622,7 @@
   (iter a null-value))
 
 
-;; EXERCISE 1.33
+;;; EXERCISE 1.33
 
 (define (filterd-accumulate filter combiner null-value term a next b)
   (define (iter a result)
@@ -645,5 +645,55 @@
 ;; b
 
 ;; WIP
+
+
+;;; EXERCISE 1.35
+
+;; 黄金比 $ \phi $ が x -> 1 + 1/x という変形の不動点であることは、
+;; 黄金比が次の式を満たすことから明らかである。
+
+;; $ \phi^2 = \phi + 1 $
+
+;; 黄金比を求める手続きは次の通り。
+
+(define (golden-ratio)
+  (fixed-point (lambda (x) (+ 1 (/ 1 x)))
+               1.0))
+
+
+;;; EXERCISE 1.36
+
+(define tolerance 0.00001)
+
+(define (fixed-point f first-guess)
+  (define (close-enough? v1 v2)
+    (< (abs (- v1 v2)) tolerance))
+  (define (try guess)
+    (display guess)
+    (newline)
+    (let ((next (f guess)))
+      (if (close-enough? guess next)
+          next
+          (try next))))
+  (try first-guess))
+
+;; $ x -> \log(1000) / \log(x) $ の不動点を求めることによって
+;; x^x = 1000 の解を求める
+
+;; 平均緩和法を利用しない場合
+
+(define (exercise-1.36)
+  (fixed-point (lambda (x) (/ (log 1000) (log x)))
+               10.0))
+
+;; 33 ステップを要した
+
+;; 平均緩和法を利用する場合
+
+(define (exercise-1.36-avg)
+  (fixed-point (lambda (x) (average x (/ (log 1000) (log x))))
+               10.0))
+
+;; 10 ステップを要した
 
 
