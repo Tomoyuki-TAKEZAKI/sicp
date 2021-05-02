@@ -537,3 +537,113 @@
 ;; したがって、元の square を使う手続きが $ \Theta ( \log n ) $ であるのに対して、
 ;; Louis の手続きは $ \Theta (n) $ である。
 
+
+
+;;; EXERCISE 1.30
+
+(define (sum term a next b)
+  (define (iter a result)
+    (if (> a b)
+        result
+        (iter (next a) (+ result (term a)))))
+  (iter a 0))
+
+
+;;; EXERCISE 1.31
+
+;; a 
+;; 特定範囲の点における関数の値の積を返す手続きは次の通り
+
+(define (product term a next b)
+  (define (iter a result)
+    (if (> a b)
+        result
+        (iter (next a) (* result (term a)))))
+  (iter a 1))
+
+;; factorial は次の通り定義できる
+
+(define (factorial n)
+  (product identity 1 inc n))
+
+;; ここで、次の手続きを利用した
+
+(define (inc n) (+ n 1))
+(define (identity x) x)
+
+;; pi/4 の近似値は次の関数で与えられる
+
+(define (pi-over-four-approx n)
+  (define (numerator n)
+    (define (term m)
+      (if (even? m)
+          (+ m 2)
+          (+ m 1)))
+    (product term 1.0 inc n))
+  (define (denominator n)
+    (define (term m)
+      (if (even? m)
+          (+ m 1)
+          (+ m 2)))
+    (product term 1.0 inc n))
+  (/ (numerator n) (denominator n)))
+
+;; b
+
+(define (product term a next b)
+  (if (> a b)
+      1
+      (* (term a)
+      (product term (next a) next b))))
+
+
+;; EXERCISE 1.32
+
+;; a
+
+(define (accumulate combiner null-value term a next b)
+    (if (> a b)
+        null-value
+        (combiner (term a)
+        (accumulate combiner null-value term (next a) next b))))
+
+(define (sum term a next b)
+  (accumulate + 0 term a next b))
+(define (product term a next b)
+  (accumulate * 1 term a next b))
+
+;; b
+
+(define (accumulate combiner null-value term a next b)
+  (define (iter a result)
+    (if (> a b)
+        result
+        (iter (next a) (combiner result (term a)))))
+  (iter a null-value))
+
+
+;; EXERCISE 1.33
+
+(define (filterd-accumulate filter combiner null-value term a next b)
+  (define (iter a result)
+    (if (> a b)
+        result
+        (iter (next a) (combiner
+                        result
+                        (if (filter a)
+                            (term a)
+                            null-value)))))
+  (iter a null-value))
+
+;; WIP filter が 引数 a を取ることを知っている前提になっている
+;; より一般的な記述にする
+
+;; a
+(define (sum-of-squares-of-prime a b)
+  (filterd-accumulate prime? + 0 square a inc b))
+
+;; b
+
+;; WIP
+
+
