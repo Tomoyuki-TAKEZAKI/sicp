@@ -340,3 +340,108 @@
       #t
       (for-each proc (cdr items))))
 
+
+;;; EXERCISE 2.24
+
+(list 1 (list 2 (list 3 4)))
+
+;; インタプリタの表示する結果
+;; (1 (2 ( 3 4)))
+;; 箱-点構造と木としての解釈は省略
+
+
+;;; EXERCISE 2.25
+
+(define exercise-2.25-1 (list 1 3 (list 5 7) 9))
+(car (cdr (car (cdr (cdr exercise-2.25-1)))))
+
+(define exercise-2.25-2 (list (list 7)))
+(car (car exercise-2.25-2))
+
+(define exercise-2.25-3 (list 1 (list 2 (list 3 (list 4 (list 5 (list 6 7)))))))
+(car (cdr (car (cdr (car (cdr (car (cdr (car (cdr (car (cdr exercise-2.25-3 ))))))))))))
+
+
+;;; EXERCISE 2.26
+
+(define x (list 1 2 3))
+(define y (list 4 5 6))
+
+(append x y)
+;; (1 2 3 4 5 6)
+
+(cons x y)
+;; ((1 2 3) 4 5 6)
+
+(list x y)
+;; ((1 2 3) (4 5 6))
+
+
+;;; EXERCISE 2.30
+
+;; 直接的な（高階手続きをまったく使わない）やり方
+
+(define (square-tree tree)
+  (cond ((null? tree) nil)
+        ((not (pair? tree)) (square tree))
+        (else (cons (square-tree (car tree))
+                    (square-tree (cdr tree))))))
+
+;; map と再帰を使うやり方
+
+(define (square-tree tree)
+  (map (lambda (sub-tree)
+         (if (pair? sub-tree)
+             (square-tree sub-tree)
+             (square sub-tree)))
+       tree))
+
+
+;;; EXERCISE 2.31
+
+(define (tree-map proc tree)
+  (map (lambda (sub-tree)
+         (if (pair? sub-tree)
+             (tree-map proc sub-tree)
+             (proc sub-tree)))
+       tree))
+
+
+;;; EXERCISE 2.32
+
+(define (subsets s)
+  (if (null? s)
+      (list nil)
+      (let ((rest (subsets (cdr s))))
+        (append rest (map (lambda (x) (cons (car s) x)) rest)))))
+
+;; 手続き subsets の動作は次のように理解できる
+;; まず、集合 s の要素のうちある一つを (car s) により選び、ここでは e と呼ぶことにする。
+;; 残りの要素は (cdr s) であり、手続き中では rest と名付けられている。
+;; さて、元の集合 s のすべての部分集合（以下、冪集合と呼ぶ）は e を含むものと含まないものに分類できる。
+;; 手続き map では、 集合 s の冪集合のうち、 e を含むものを生成する。
+;; subsets の再帰呼び出しの中では、上述の e を含まない残りの集合の要素について、
+;; 同様の処理を行う。この再帰呼び出しは集合の要素の数だけ繰り返し、
+;; 最終的に要素数が 0 になると (list nil) 、すなわち (()) が返る。
+;; この (()) に append を繰り返すことで、目的の集合を得る。
+;; 
+;; (list 1 2 3) を例にとると、次の通り。
+;; 
+;; (1 2 3)
+;; 要素 1 を選ぶ  // step-1
+;; 要素 2 を選ぶ  // step-2
+;; 要素 3 を選ぶ  // step-3
+;; 要素が残っていないので、 (list nil) すなわち (()) が返る
+;; step-3 で選んだ要素 3 について、 () に lambda を適用した結果は
+;; (3) であり、これが append される。
+;; (() (3))
+;; これは元の集合から要素 (1 2) を除いた集合の冪集合である。
+;; step-2 で選んだ要素 2 について、() (3) に lambda を適用した結果は
+;; (2) (2 3) であり、これらが append される。
+;; (() (3) (2) (2 3))
+;; これは元の集合から要素 (1) を除いた集合の冪集合である。
+;; step-1 で選んだ要素 1 について、() (3) (2) (2 3) に lambda を適用した結果は
+;; (1) (1 3) (1 2) (1 2 3) であり、これらが append される。
+;; (() (3) (2) (2 3) (1) (1 3) (1 2) (1 2 3))
+;; これは元の集合の冪集合である。
+
