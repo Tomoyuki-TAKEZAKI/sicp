@@ -41,7 +41,7 @@
     (average (y-point p1) (y-point p2)))))
 
 
-;; EXERCISE 2.3
+;;; EXERCISE 2.3
 
 ;; 長方形を、その上のある一点から伸びる二つの線分の組として表現する
 
@@ -105,4 +105,35 @@
 ;; side1 = (diag1 + diag2)/2
 ;; side2 = (diag1 - diag2)/2
 ;; 
+
+
+;;; EXERCISE 2.4
+
+(define (cons x y)
+  (lambda (m) (m x y)))
+
+(define (car z)
+  (z (lambda (p q) p)))
+
+(define (cdr z)
+  (z (lambda (p q) q)))
+
+
+;;; EXERCISE 2.5
+
+;; この実装では整数の入力を実数で取り出してしまう
+
+(define (cons x y)
+  (* (expt 2 x) (expt 3 y)))
+
+(define (car z)
+  (if (= (modulo z 3) 0)
+      (car (/ z 3))
+      (log z 2)))
+
+(define (cdr z)
+  (if (= (modulo z 2) 0)
+      (cdr (/ z 2))
+      (log z 3)))
+
 
