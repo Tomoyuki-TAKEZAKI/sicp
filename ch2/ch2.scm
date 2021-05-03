@@ -239,3 +239,104 @@
 ;           (make-interval (min p1 p2) (max p1 p2)))
 ;         )))
 
+
+;;; EXERCISE 2.17
+
+(define (last-pair items)
+  (if (null? (cdr items))
+      (car items)
+      (last-pair (cdr items))))
+
+
+;;; EXERCISE 2.18
+
+(define (reverse items)
+  (define (iter items answer)
+    (if (null? items)
+        answer
+        (iter (cdr items) (cons (car items) answer))))
+  (iter items nil))
+
+
+;;; EXERCISE 2.20
+
+;; TODO EXERCISE 2.22 と同じく逆順になる
+;; reverse を使わずに対処するように修正する
+
+(define (same-parity . items)
+  (define (iter x items answer)
+    (define (same-parity? x y)
+      (let ((parity (modulo (- x y) 2)))
+        (= 0 parity)))
+    (if (null? items)
+        (reverse answer)
+        (if (same-parity? x (car items))
+            (iter x (cdr items) (cons (car items) answer))
+            (iter x (cdr items) answer))))
+  (iter (car items) items nil))
+
+
+;;; EXERCISE 2.21
+
+(define (square-list items)
+  (if (null? items)
+      nil
+      (cons (square (car items)) (square-list (cdr items)))))
+
+(define (square-list items)
+  (map square items))
+
+;; (define (square x) (* x x))
+
+
+;;; EXRECISE 2.22
+
+;; Louis による square-list 手続きは次の通り。
+
+;; (define (square-list items)
+;;   (define (iter things answer)
+;;     (if (null? things)
+;;         answer
+;;         (iter (cdr things) 
+;;               (cons (square (car things))
+;;                     answer))))
+;;   (iter items nil))
+
+;; cons の引数の順序が逆になっているため、答えとなるリストは望むものの逆順になる。
+;; 例として、 (list 1 2 3) に対する処理を考えると分かりやすい。
+;; イテレーションごとの iter の引数は次の通り
+;;
+;; (cons 1 (cons 2 (cons 3 nil))), nil
+;; (cons 2 (cons 3 nil)), (cons 1 nil)
+;; (cons 3 nil), (cons 4 (cons 1 nil))
+;; nil, (cons 9 (cons 4 (cons 1 nil)))
+
+;; Louis による修正版の手続きは次の通り。
+
+;; (define (square-list items)
+;;   (define (iter things answer)
+;;     (if (null? things)
+;;         answer
+;;         (iter (cdr things)
+;;               (cons answer
+;;                     (square (car things))))))
+;;   (iter items nil))
+
+;; この場合、チェーン内の次のペアが cdr ではなく car に入るため、結果がリストとならない。
+;; 例として、 (list 1 2 3) に対する処理を考えると分かりやすい。
+;; イテレーションごとの iter の引数は次の通り。
+;;
+;; (cons 1 (cons 2 (cons 3 nil))), nil
+;; (cons 2 (cons 3 nil)), (cons nil 1)
+;; (cons 3 nil), (cons (cons nil 1) 4)
+;; nil, (cons (cons (cons nil 1) 4) 9)
+
+
+;;; EXERCISE 2.23
+
+(define (for-each proc items)
+  (proc (car items))
+  (if (null? (cdr items))
+      #t
+      (for-each proc (cdr items))))
+
