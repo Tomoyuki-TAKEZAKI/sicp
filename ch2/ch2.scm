@@ -137,3 +137,105 @@
       (log z 3)))
 
 
+;;; EXERCISE 2.7
+
+(define (lower-bound interval)
+  (car interval))
+
+(define (upper-bound interval)
+  (cdr interval))
+
+;;; EXERCISE 2.8
+
+;; 区間の (-1) 倍を考える
+;; これは区間の上限と下限を入れ替え、 (-1) 倍すれば良い
+;; 区間の差は、一つ目の区間と二つ目の区間の (-1) 倍との和に等しい
+
+(define (sub-interval x y)
+  (make-interval (- (lower-bound x) (upper-bound y))
+                 (- (upper-bound x) (lower-bound y))))
+
+
+;;; EXERCISE 2.9
+
+;; 区間 (a, b), (c, d) を考える。
+;; ここで区間 (x, y) は下限 x, 上限 y であるとする。
+
+;; 区間の和
+;; (a+c, b+d)
+;; この区間の幅は、元の区間の幅の和となる。
+;; (b+d) - (a+c) = (b-a) + (d-c)
+
+;; 区間の差
+;; (a-d, b-c)
+;; この区間の幅は、元の区間の幅の和となる。
+;; (b-c) - (a-d) = (b-a) + (d-c)
+
+;; 区間の積,商
+;; 一方、区間の積や商の幅は、元の区間の幅の積や商ではない。
+;; 次の具体例を考える。
+;;
+;; (1,2),(3,4)
+;; 
+;; 区間の積は (3,8) となるが、この幅 5 は元の区間の幅の積 1 とは等しくない。
+;; 区間の商は (1/4, 2/3) となるが、この幅 5/12 は元の区間の幅の積 1 とは等しくない。
+
+
+;; EXERCISE 2.10
+
+;; TODO エラーメッセージ表示を改善
+;; 現状だと print-interval が評価された後に "Division ... zero #void" が表示される
+
+(define (div-interval x y)
+  (let ((ub-y (upper-bound y))
+        (lb-y (lower-bound y)))
+    (if (< (* ub-y lb-y) 0) 
+        (error "Division by section across zero" (print-interval y))
+        (mul-interval
+          x
+          (make-interval (/ 1.0 ub-y)
+                         (/ 1.0 lb-y))))))
+
+(define (print-interval interval)
+  (display "interval: [ lower-bound: ")
+  (display (lower-bound interval))
+  (display ", upper-bound: ")
+  (display (upper-bound interval))
+  (display " ]"))
+
+
+;;; EXERCISE 2.11
+
+;; 区間を次の三つに分類する。
+;;
+;; 1. 区間の下端が正
+;; 2. ゼロをまたぐ区間
+;; 3. 区間の上端が負
+;; 
+;; したがって、二つの区間の積は9パターンに分類できる。これらをさらに次の通り分類する。
+;;
+;; a. 二つの区間がともに 2. の場合
+;; 上端と下端の可能な4つの積がいずれも上端もしくは下端となりうる。
+;; したがって、合計4回の掛け算が必要になる。
+;; 
+;; WIP その他の場合分け
+
+; (define (mul-interval x y)
+;   (let ((lb-x (lower-bound x))
+;         (lb-y (lower-bound y))
+;         (ub-x (upper-bound x))
+;         (ub-y (upper-bound y)))
+;     (if (and (< (* lb-x ub-x) 0) (< (* lb-y ub-y) 0))
+;         (let
+;           ((p1 (* lb-x lb-y))
+;            (p2 (* lb-x ub-y))
+;            (p3 (* ub-x lb-y))
+;            (p4 (* ub-x ub-y)))
+;           (make-interval (min p1 p2 p3 p4)
+;                          (max p1 p2 p3 p4)))
+;         (let
+;           ((p1 (* lb-x ub-y))
+;            (p2 (* lb-y ub-x)))
+;           (make-interval (min p1 p2) (max p1 p2)))
+;         )))
+
